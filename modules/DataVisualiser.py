@@ -34,7 +34,7 @@ CATEGORIES = [
 ]
 
 
-class DataVisualizer:
+class DataVisualiser:
     def __init__(self, orbit_counts):
         self.orbit_counts = orbit_counts
         self.categories = CATEGORIES

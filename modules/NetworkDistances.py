@@ -1,7 +1,7 @@
 import pandas as pd
 from itertools import combinations
 import numpy as np
-from modules.DataNormalizer import DataNormalizer
+from modules.DataNormaliser import DataNormaliser
 from sklearn.metrics.pairwise import cosine_distances
 
 
@@ -10,16 +10,16 @@ class NetworkDistances:
         self.orbit_counts_df = orbit_counts_df
         self.similarity_measures_df = pd.DataFrame()
         self.column_combinations = list(combinations(self.orbit_counts_df.columns, 2))
-        self.orbit_counts_log_normal = DataNormalizer(
+        self.orbit_counts_log_normal = DataNormaliser(
             orbit_counts_df
         ).log_scale_percentual_normalization()
-        self.orbit_counts_percentual_normal = DataNormalizer(
+        self.orbit_counts_percentual_normal = DataNormaliser(
             orbit_counts_df
         ).percentual_normalization()
 
     def computeRGFDist(self):
         computations = (
-            DataNormalizer(self.orbit_counts_df)
+            DataNormaliser(self.orbit_counts_df)
             .log_scale_percentual_normalization()
             .apply(
                 lambda col: col.map(

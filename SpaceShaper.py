@@ -30,10 +30,10 @@
 
 import pandas as pd
 from shapely.geometry import Polygon
-from modules.DataNormalizer import DataNormalizer
+from modules.DataNormaliser import DataNormaliser
 
 df = (
-    DataNormalizer(
+    DataNormaliser(
         pd.read_csv("output/graphlet_counts.csv").drop(columns=["Unnamed: 0"])
     ).percentual_normalization()
     * 100

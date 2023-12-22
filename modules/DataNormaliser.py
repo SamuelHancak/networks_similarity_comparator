@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class DataNormalizer:
+class DataNormaliser:
     def __init__(self, data):
         self.data = data
 

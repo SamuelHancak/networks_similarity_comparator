@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from itertools import combinations
-from modules.DataNormalizer import DataNormalizer
+from modules.DataNormaliser import DataNormaliser
 import math
 
 
@@ -15,7 +15,7 @@ class NetworkDistances:
 
     def computeRGFDist(self):
         computations = (
-            DataNormalizer(self.orbit_counts_df)
+            DataNormaliser(self.orbit_counts_df)
             .log_scale_normalization2()
             .apply(
                 lambda col: col.map(
@@ -39,7 +39,7 @@ class NetworkDistances:
 
     def computeHellingerDist(self):
         computations = (
-            DataNormalizer(self.orbit_counts_df)
+            DataNormaliser(self.orbit_counts_df)
             .percentual_normalization()
             .apply(lambda col: col.map(lambda val: np.sqrt(val)))
         )

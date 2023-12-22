@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import pandas as pd
-from modules.DataVisualizer import CATEGORIES
+from modules.DataVisualiser import CATEGORIES
 
 
 class MeasuresViewer:

@@ -2,9 +2,10 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
 from tkinterdnd2 import DND_FILES, TkinterDnD
-from modules.DataVisualizer import DataVisualizer
+from modules.DataVisualiser import DataVisualiser
 from modules.GraphletCounter import GraphletCounter
 from modules.MeasuresViewer import MeasuresViewer
+from modules.ROCCurveVisualiser import ROCCurveVisualiser
 
 
 class GUI:
@@ -178,7 +179,7 @@ class GUI:
             frame,
             text="Show graphs",
             state=DISABLED,
-            command=lambda: DataVisualizer(
+            command=lambda: DataVisualiser(
                 self.orbit_counts_df
             ).visualize_orbit_counts(),
             width=10,
@@ -240,6 +241,9 @@ class GUI:
                 display_similarity_measures_btn.config(
                     state=DISABLED if self.similarities_df is None else NORMAL
                 ),
+                display_roc_curve_btn.config(
+                    state=DISABLED if self.similarities_df is None else NORMAL
+                ),
             ],
             width=10,
         )
@@ -271,5 +275,19 @@ class GUI:
             width=15,
         )
         display_similarity_measures_btn.grid(row=13, column=1, sticky=NSEW)
+
+        separator = ttk.Separator(frame, orient=HORIZONTAL)
+        separator.grid(row=14, column=0, columnspan=4, sticky=NSEW, pady=10)
+
+        display_roc_curve_btn = Button(
+            frame,
+            text="Display ROC curve",
+            state=DISABLED,
+            command=lambda: ROCCurveVisualiser(
+                input_df=self.similarities_df
+            ).generate_roc_curve(),
+            width=15,
+        )
+        display_roc_curve_btn.grid(row=15, column=0, sticky=NSEW)
 
         self.root.mainloop()

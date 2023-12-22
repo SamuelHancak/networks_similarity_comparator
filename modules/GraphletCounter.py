@@ -2,8 +2,9 @@ import pandas as pd
 import subprocess
 import os
 
-from modules.DataNormalizer import DataNormalizer
+from modules.DataNormaliser import DataNormaliser
 from modules.NetworkDistances import NetworkDistances
+from modules.DataClustering import DataClustering
 
 PROCESS_CALL_NAME = "./orca/orcao"
 GRAPHLETS_COUNTS_FILE_NAME = "graphlet_counts.csv"
@@ -113,7 +114,7 @@ class GraphletCounter:
         self.__orbit_couts_df = orbit_counts_df
 
         if self.normalise:
-            orbit_counts_df = DataNormalizer(orbit_counts_df).percentual_normalization()
+            orbit_counts_df = DataNormaliser(orbit_counts_df).percentual_normalization()
             if self.output_folder_path is not None:
                 orbit_counts_df.to_csv(
                     f"{self.output_folder_path}/norm-{GRAPHLETS_COUNTS_FILE_NAME}",
@@ -158,6 +159,11 @@ class GraphletCounter:
                 f"{self.output_folder_path}/{SIMILARITY_MEASURES_FILE_NAME}",
                 encoding="utf-8",
             )
+
+        cluster_visualizer = DataClustering(input_df=self.__orbit_couts_df)
+        cluster_visualizer.load_and_normalize_data()
+        cluster_visualizer.perform_clustering()
+        cluster_visualizer.visualize_clusters_3d()
 
         return dist.similarity_measures_df
 
