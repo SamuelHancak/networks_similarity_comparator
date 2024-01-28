@@ -2,10 +2,12 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
 from tkinterdnd2 import DND_FILES, TkinterDnD
+
 from modules.DataVisualiser import DataVisualiser
 from modules.GraphletCounter import GraphletCounter
 from modules.MeasuresViewer import MeasuresViewer
 from modules.ROCCurveVisualiser import ROCCurveVisualiser
+from modules.DataClustering import DataClustering
 
 
 class GUI:
@@ -59,7 +61,7 @@ class GUI:
 
     def create_main_window(self):
         self.root = TkinterDnD.Tk()
-        self.root.title("Graph similarity measures")
+        self.root.title("Networks similarity measures")
 
         frame = Frame(self.root)
         frame.pack(padx=10, pady=10)
@@ -146,7 +148,7 @@ class GUI:
 
         normalisation_val = IntVar()
         normalisation_checkbox = Checkbutton(
-            frame, text="Normalise data", variable=normalisation_val
+            frame, text="Normalise data (log)", variable=normalisation_val
         )
         normalisation_checkbox.grid(row=4, column=1, pady=[5, 0], sticky=W)
 
@@ -168,6 +170,9 @@ class GUI:
                     state=DISABLED if self.orbit_counts_df is None else NORMAL
                 ),
                 display_graphlet_counts_btn.config(
+                    state=DISABLED if self.orbit_counts_df is None else NORMAL
+                ),
+                clustering_btn.config(
                     state=DISABLED if self.orbit_counts_df is None else NORMAL
                 ),
             ],
@@ -289,5 +294,16 @@ class GUI:
             width=15,
         )
         display_roc_curve_btn.grid(row=15, column=0, sticky=NSEW)
+
+        clustering_btn = Button(
+            frame,
+            text="Clustering",
+            state=DISABLED,
+            command=lambda: DataClustering(
+                input_df=self.g_counter.get_orbit_counts_df()
+            ).clustering(),
+            width=15,
+        )
+        clustering_btn.grid(row=15, column=1, sticky=NSEW)
 
         self.root.mainloop()

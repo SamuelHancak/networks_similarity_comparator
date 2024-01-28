@@ -160,11 +160,6 @@ class GraphletCounter:
                 encoding="utf-8",
             )
 
-        cluster_visualizer = DataClustering(input_df=self.__orbit_couts_df)
-        cluster_visualizer.load_and_normalize_data()
-        cluster_visualizer.perform_clustering()
-        cluster_visualizer.visualize_clusters_3d()
-
         return dist.similarity_measures_df
 
     def get_orbit_counts_df(self):

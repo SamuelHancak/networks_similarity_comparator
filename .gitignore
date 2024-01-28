@@ -51,3 +51,6 @@ l10n/
 **/input
 **/output
 **/__pycache__
+*.in
+*.out
+*.csv
