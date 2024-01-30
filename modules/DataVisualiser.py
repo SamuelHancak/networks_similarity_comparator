@@ -1,5 +1,7 @@
 import plotly.graph_objects as go
 
+from modules.DataNormaliser import DataNormaliser
+
 CATEGORIES = [
     "G1",
     "G2",
@@ -36,7 +38,9 @@ CATEGORIES = [
 
 class DataVisualiser:
     def __init__(self, orbit_counts):
-        self.orbit_counts = orbit_counts
+        self.orbit_counts = DataNormaliser(
+            orbit_counts
+        ).log_scale_percentual_normalisation()
         self.categories = CATEGORIES
         self.fig = None
 
@@ -53,10 +57,10 @@ class DataVisualiser:
                 )
             )
 
-            self.fig.update_layout(
-                polar=dict(radialaxis=dict(visible=True, range=[0, 1.1])),
-                showlegend=True,
-            )
+        self.fig.update_layout(
+            polar=dict(radialaxis=dict(visible=True, type="log")),
+            showlegend=True,
+        )
 
         self.fig.show()
 
@@ -73,6 +77,7 @@ class DataVisualiser:
                 yaxis_title="Values",
                 showlegend=True,
             )
+        self.fig.update_yaxes(type="log")
 
         self.fig.show()
 
@@ -99,6 +104,6 @@ class DataVisualiser:
         self.fig.show()
 
     def visualize_orbit_counts(self):
-        # self.create_polar_scatter()
+        self.create_polar_scatter()
         self.create_bar_chart()
         self.create_line_chart()

@@ -8,7 +8,7 @@
 # input = (
 #     DataNormalizer(
 #         pd.read_csv("output/graphlet_counts.csv")
-#     ).percentual_normalization()["geo1k_4k"]
+#     ).percentual_normalisation()["geo1k_4k"]
 #     * 100
 # )
 
@@ -35,7 +35,7 @@ from modules.DataNormaliser import DataNormaliser
 df = (
     DataNormaliser(
         pd.read_csv("output/graphlet_counts.csv").drop(columns=["Unnamed: 0"])
-    ).percentual_normalization()
+    ).percentual_normalisation()
     * 100
 )
 

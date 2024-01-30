@@ -15,11 +15,11 @@ class DataNormaliser:
 
         return df_scaled
 
-    def log_scale_normalization(self):
+    def log_scale_normalisation(self):
         return self.data.apply(np.log)
 
-    def log_scale_percentual_normalization(self):
-        return self.percentual_normalization().apply(np.log1p)
+    def log_scale_percentual_normalisation(self):
+        return self.percentual_normalisation().apply(np.log1p)
 
-    def percentual_normalization(self):
+    def percentual_normalisation(self):
         return self.data.apply(lambda col: col / (col.sum() or 1))

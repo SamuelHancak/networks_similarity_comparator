@@ -16,7 +16,7 @@ class NetworkDistances:
     def computeRGFDist(self):
         computations = (
             DataNormaliser(self.orbit_counts_df)
-            .log_scale_normalization2()
+            .log_scale_normalisation2()
             .apply(
                 lambda col: col.map(
                     lambda val: (-1 * (np.log10(val) if val > 0 else 0))
@@ -40,7 +40,7 @@ class NetworkDistances:
     def computeHellingerDist(self):
         computations = (
             DataNormaliser(self.orbit_counts_df)
-            .percentual_normalization()
+            .percentual_normalisation()
             .apply(lambda col: col.map(lambda val: np.sqrt(val)))
         )
 

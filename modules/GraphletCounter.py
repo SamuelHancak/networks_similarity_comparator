@@ -2,9 +2,7 @@ import pandas as pd
 import subprocess
 import os
 
-from modules.DataNormaliser import DataNormaliser
 from modules.NetworkDistances import NetworkDistances
-from modules.DataClustering import DataClustering
 
 PROCESS_CALL_NAME = "./orca/orcao"
 GRAPHLETS_COUNTS_FILE_NAME = "graphlet_counts.csv"
@@ -17,16 +15,15 @@ class GraphletCounter:
         input_folder_path=None,
         output_folder_path=None,
         out_data=False,
-        normalise=False,
+        freq_data=False,
     ):
         self.input_folder_path = input_folder_path
         self.output_folder_path = output_folder_path
         self.out_data = out_data
-        self.normalise = normalise
+        self.freq_data = freq_data
         self.__orbit_couts_df = pd.DataFrame()
 
-    @staticmethod
-    def __sum_columns(file_name, column_name):
+    def __sum_columns(self, file_name, column_name):
         df = pd.read_csv(file_name, sep=" ", header=None)
         column_sums = df.sum(axis=0)
         final_sums = pd.DataFrame({f"{column_name}": [0] * 30})
@@ -78,6 +75,16 @@ class GraphletCounter:
 
         return file_paths
 
+    def __read_frequencies_to_dataframe(self, file_path, file_name):
+        with open(file_path, "r") as file:
+            lines = [line.strip() for line in file.readlines()[:30]]
+
+        lines = pd.to_numeric(lines, errors="coerce")
+
+        df = pd.DataFrame(lines, columns=[file_name])
+
+        return df
+
     def orca_counting(self):
         orbit_counts_df = pd.DataFrame()
         input_files = self.__read_folder_files()
@@ -88,7 +95,7 @@ class GraphletCounter:
             )
             output_file = (
                 file
-                if self.out_data
+                if self.out_data or self.freq_data
                 else (
                     f"{self.output_folder_path}/{file_name}.out"
                     if self.output_folder_path is not None
@@ -96,30 +103,39 @@ class GraphletCounter:
                 )
             )
 
-            if not self.out_data:
+            if not self.out_data and not self.freq_data:
                 subprocess.call([PROCESS_CALL_NAME, "node", "5", file, output_file])
                 print("\n")
 
-            orbit_counts_df = pd.concat(
-                [
-                    orbit_counts_df,
-                    self.__sum_columns(file_name=output_file, column_name=file_name),
-                ],
-                axis=1,
-            )
+            if not self.freq_data:
+                orbit_counts_df = pd.concat(
+                    [
+                        orbit_counts_df,
+                        self.__sum_columns(
+                            file_name=output_file, column_name=file_name
+                        ),
+                    ],
+                    axis=1,
+                )
+            else:
+                orbit_counts_df = pd.concat(
+                    [
+                        orbit_counts_df,
+                        self.__read_frequencies_to_dataframe(
+                            file_path=file, file_name=file_name
+                        ),
+                    ],
+                    axis=1,
+                )
 
-            if self.output_folder_path is None and not self.out_data:
+            if (
+                self.output_folder_path is None
+                and not self.out_data
+                and not self.freq_data
+            ):
                 os.remove(output_file)
 
         self.__orbit_couts_df = orbit_counts_df
-
-        if self.normalise:
-            orbit_counts_df = DataNormaliser(orbit_counts_df).percentual_normalization()
-            if self.output_folder_path is not None:
-                orbit_counts_df.to_csv(
-                    f"{self.output_folder_path}/norm-{GRAPHLETS_COUNTS_FILE_NAME}",
-                    encoding="utf-8",
-                )
 
         if self.output_folder_path is not None:
             self.__orbit_couts_df.to_csv(

@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
+import pandas as pd
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
 from modules.DataVisualiser import DataVisualiser
@@ -14,7 +15,7 @@ class GUI:
     def __init__(self):
         self.root = None
         self.orbit_counts_df = None
-        self.similarities_df = None
+        self.similarities_df = pd.DataFrame()
         self.g_counter = None
 
     def __open_folder_dialog(self, folder_listbox, process_data_btn=None):
@@ -35,13 +36,13 @@ class GUI:
         folder_listbox,
         folder_listbox_o,
         orca_data_val,
-        normalisation_val,
+        freq_data_val,
     ):
         self.g_counter = GraphletCounter(
             folder_listbox.get(0, END)[0],
             folder_listbox_o.get(0, END)[0] if folder_listbox_o.size() > 0 else None,
             out_data=bool(orca_data_val.get()),
-            normalise=bool(normalisation_val.get()),
+            freq_data=bool(freq_data_val.get()),
         )
         self.orbit_counts_df = self.g_counter.orca_counting()
 
@@ -52,11 +53,17 @@ class GUI:
         hellinger_dist_val,
         minkowski_dist_val,
     ):
-        self.similarities_df = self.g_counter.count_network_similarities(
-            RGFD_dist_val,
-            sim_disp_dist_val,
-            hellinger_dist_val,
-            minkowski_dist_val,
+        self.similarities_df = pd.concat(
+            [
+                self.similarities_df,
+                self.g_counter.count_network_similarities(
+                    RGFD_dist_val,
+                    sim_disp_dist_val,
+                    hellinger_dist_val,
+                    minkowski_dist_val,
+                ),
+            ],
+            axis=1,
         )
 
     def create_main_window(self):
@@ -146,11 +153,13 @@ class GUI:
         )
         orca_data_checkbox.grid(row=4, column=0, pady=[5, 0], sticky=W)
 
-        normalisation_val = IntVar()
-        normalisation_checkbox = Checkbutton(
-            frame, text="Normalise data (log)", variable=normalisation_val
+        graphlet_freq_data_val = IntVar()
+        graphlet_freq_data_checkbox = Checkbutton(
+            frame,
+            text="Data are graphlets frequencies",
+            variable=graphlet_freq_data_val,
         )
-        normalisation_checkbox.grid(row=4, column=1, pady=[5, 0], sticky=W)
+        graphlet_freq_data_checkbox.grid(row=4, column=1, pady=[5, 0], sticky=W)
 
         process_data_btn = Button(
             frame,
@@ -161,7 +170,7 @@ class GUI:
                     input_folder_listbox,
                     output_folder_listbox,
                     orca_data_val,
-                    normalisation_val,
+                    graphlet_freq_data_val,
                 ),
                 graphs_btn.config(
                     state=DISABLED if self.orbit_counts_df is None else NORMAL
@@ -295,13 +304,21 @@ class GUI:
         )
         display_roc_curve_btn.grid(row=15, column=0, sticky=NSEW)
 
+        def __clustering(self):
+            self.similarities_df = DataClustering(
+                input_df=self.g_counter.get_orbit_counts_df(),
+                similarity_measures_df=self.similarities_df,
+            ).clustering()
+
+            display_similarity_measures_btn.config(
+                state=DISABLED if self.similarities_df is None else NORMAL
+            ),
+
         clustering_btn = Button(
             frame,
             text="Clustering",
             state=DISABLED,
-            command=lambda: DataClustering(
-                input_df=self.g_counter.get_orbit_counts_df()
-            ).clustering(),
+            command=lambda: __clustering(self),
             width=15,
         )
         clustering_btn.grid(row=15, column=1, sticky=NSEW)

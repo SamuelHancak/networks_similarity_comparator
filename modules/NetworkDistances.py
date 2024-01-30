@@ -12,15 +12,15 @@ class NetworkDistances:
         self.column_combinations = list(combinations(self.orbit_counts_df.columns, 2))
         self.orbit_counts_log_normal = DataNormaliser(
             orbit_counts_df
-        ).log_scale_percentual_normalization()
+        ).log_scale_percentual_normalisation()
         self.orbit_counts_percentual_normal = DataNormaliser(
             orbit_counts_df
-        ).percentual_normalization()
+        ).percentual_normalisation()
 
     def computeRGFDist(self):
         computations = (
             DataNormaliser(self.orbit_counts_df)
-            .log_scale_percentual_normalization()
+            .log_scale_percentual_normalisation()
             .apply(
                 lambda col: col.map(
                     lambda val: (-1 * (np.log10(val) if val > 0 else 0))
