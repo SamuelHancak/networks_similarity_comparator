@@ -17,7 +17,6 @@ class DataClustering:
         self.labels = None
         self.distances = None
         self.result_df = None
-        self.coordinates_df = None
         self.reduced_features = None
         self.cluster_centers = None
         self.cluster_df = None
@@ -46,21 +45,22 @@ class DataClustering:
         )
 
     def __count_distances(self):
-        column_combinations = list(combinations(self.coordinates_df.columns, 2))
+        column_combinations = list(combinations(self.result_df.columns, 2))
 
         result_df = pd.DataFrame()
         for col1, col2 in column_combinations:
             result_df[col2 + "-" + col1] = abs(
-                self.coordinates_df[col2] - self.coordinates_df[col1]
+                self.result_df[col2] - self.result_df[col1]
             )
 
-        self.similarity_measures_df["Clustering"] = result_df.sum()
+        self.similarity_measures_df["ClusteringCentroid"] = result_df.sum()
 
         return self.similarity_measures_df
 
     def __visualize_clusters_3d(self):
         pca = PCA(n_components=3)
         self.reduced_features = pca.fit_transform(self.feature_matrix)
+
         cluster_centers = pca.transform(self.kmeans.cluster_centers_)
 
         self.cluster_df = pd.DataFrame(
@@ -100,17 +100,6 @@ class DataClustering:
             .data[0]
         )
 
-        self.coordinates_df = pd.DataFrame(
-            {
-                "": self.network_names,
-                "X": self.reduced_features[:, 0].tolist(),
-                "Y": self.reduced_features[:, 1].tolist(),
-                "Z": self.reduced_features[:, 2].tolist(),
-            }
-        ).T
-        self.coordinates_df.columns = self.coordinates_df.iloc[0]
-        self.coordinates_df = self.coordinates_df[1:]
-
         fig.update_layout(title_text="KMeans Clustering")
         fig.show()
 
@@ -126,7 +115,7 @@ class DataClustering:
 # cluster_visualizer = DataClustering(
 #     input_df=dataFrame, similarity_measures_df=pd.DataFrame()
 # )
-# print(cluster_visualizer.clustering())
+# cluster_visualizer.clustering()
 
 # ----------
 

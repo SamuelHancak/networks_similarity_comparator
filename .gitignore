@@ -54,3 +54,4 @@ l10n/
 *.in
 *.out
 *.csv
+**/venv
