@@ -35,7 +35,9 @@ class NetworkDistances:
                 (computations[col1] == 0) | (computations[col2] == 0)
             ].index.to_numpy()
 
-            result_df[col2 + "-" + col1] = abs(computations[col2] - computations[col1])
+            result_df[col2 + "---" + col1] = abs(
+                computations[col2] - computations[col1]
+            )
             if len(zero_cols) > 0:
                 result_df.iloc[zero_cols, result_df.shape[1] - 1] = 0
 
@@ -48,7 +50,7 @@ class NetworkDistances:
 
         result_df = pd.DataFrame()
         for col1, col2 in self.column_combinations:
-            result_df[col2 + "-" + col1] = (
+            result_df[col2 + "---" + col1] = (
                 computations[col2] - computations[col1]
             ).abs()
 
@@ -61,7 +63,7 @@ class NetworkDistances:
 
         result_df = pd.DataFrame()
         for col1, col2 in self.column_combinations:
-            result_df[col2 + "-" + col1] = (
+            result_df[col2 + "---" + col1] = (
                 computations[col2] - computations[col1]
             ) ** 2
 
@@ -72,7 +74,7 @@ class NetworkDistances:
 
         result_df = pd.DataFrame()
         for col1, col2 in self.column_combinations:
-            result_df[col2 + "-" + col1] = (
+            result_df[col2 + "---" + col1] = (
                 self.orbit_counts_percentual_normal[col2]
                 - self.orbit_counts_percentual_normal[col1]
             ).abs() ** p
@@ -84,7 +86,7 @@ class NetworkDistances:
 
         result_df = pd.DataFrame()
         for col1, col2 in self.column_combinations:
-            result_df[col2 + "-" + col1] = (
+            result_df[col2 + "---" + col1] = (
                 similarity_matrix[
                     self.orbit_counts_percentual_normal.columns.get_loc(col2)
                 ]
@@ -106,7 +108,7 @@ class NetworkDistances:
             intersection_size = len(set1.intersection(set2))
             union_size = len(set1.union(set2))
 
-            result_df[col2 + "-" + col1] = (
+            result_df[col2 + "---" + col1] = (
                 intersection_size / union_size if union_size != 0 else 0
             )
 

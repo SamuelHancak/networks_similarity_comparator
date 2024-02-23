@@ -50,7 +50,7 @@ class DataClustering:
 
         result_df = pd.DataFrame()
         for col1, col2 in column_combinations:
-            result_df[col2 + "-" + col1] = abs(
+            result_df[col2 + "---" + col1] = abs(
                 self.coordinates_df[col2] - self.coordinates_df[col1]
             )
 

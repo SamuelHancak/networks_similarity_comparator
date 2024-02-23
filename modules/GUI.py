@@ -9,6 +9,7 @@ from modules.GraphletCounter import GraphletCounter
 from modules.MeasuresViewer import MeasuresViewer
 from modules.ROCCurveVisualiser import ROCCurveVisualiser
 from modules.DataClustering import DataClustering
+from neuralNetwork.NetworkClass import SiameseNetwork
 
 
 class GUI:
@@ -52,6 +53,7 @@ class GUI:
         sim_disp_dist_val,
         hellinger_dist_val,
         minkowski_dist_val,
+        cosine_dist_val,
     ):
         self.similarities_df = pd.concat(
             [
@@ -61,6 +63,7 @@ class GUI:
                     sim_disp_dist_val,
                     hellinger_dist_val,
                     minkowski_dist_val,
+                    cosine_dist_val,
                 ),
             ],
             axis=1,
@@ -184,6 +187,9 @@ class GUI:
                 clustering_btn.config(
                     state=DISABLED if self.orbit_counts_df is None else NORMAL
                 ),
+                network_btn.config(
+                    state=DISABLED if self.orbit_counts_df is None else NORMAL
+                ),
             ],
             width=10,
         )
@@ -251,6 +257,7 @@ class GUI:
                     bool(sim_disp_dist_val.get()),
                     bool(hellinger_dist_val.get()),
                     bool(minkowski_dist_val.get()),
+                    bool(cosine_dist_val.get()),
                 ),
                 display_similarity_measures_btn.config(
                     state=DISABLED if self.similarities_df is None else NORMAL
@@ -261,7 +268,7 @@ class GUI:
             ],
             width=10,
         )
-        count_similarities_btn.grid(row=11, column=0, columnspan=4)
+        count_similarities_btn.grid(row=11, column=0, columnspan=4, sticky=NSEW)
 
         separator = ttk.Separator(frame, orient=HORIZONTAL)
         separator.grid(row=12, column=0, columnspan=4, sticky=NSEW, pady=10)
@@ -293,16 +300,24 @@ class GUI:
         separator = ttk.Separator(frame, orient=HORIZONTAL)
         separator.grid(row=14, column=0, columnspan=4, sticky=NSEW, pady=10)
 
-        display_roc_curve_btn = Button(
+        def __networking(self):
+            similarity_scores = SiameseNetwork(
+                self.g_counter.get_orbit_counts_df()
+            ).predict_similarity()
+            self.similarities_df["NeuralNetwork"] = similarity_scores
+
+            display_similarity_measures_btn.config(
+                state=DISABLED if self.similarities_df is None else NORMAL
+            ),
+
+        network_btn = Button(
             frame,
-            text="Display ROC curve",
+            text="Neural network",
             state=DISABLED,
-            command=lambda: ROCCurveVisualiser(
-                input_df=self.similarities_df
-            ).generate_roc_curve(),
+            command=lambda: __networking(self),
             width=15,
         )
-        display_roc_curve_btn.grid(row=15, column=0, sticky=NSEW)
+        network_btn.grid(row=15, column=0, sticky=NSEW)
 
         def __clustering(self):
             self.similarities_df = DataClustering(
@@ -322,5 +337,19 @@ class GUI:
             width=15,
         )
         clustering_btn.grid(row=15, column=1, sticky=NSEW)
+
+        separator = ttk.Separator(frame, orient=HORIZONTAL)
+        separator.grid(row=16, column=0, columnspan=4, sticky=NSEW, pady=10)
+
+        display_roc_curve_btn = Button(
+            frame,
+            text="Display ROC curve",
+            state=DISABLED,
+            command=lambda: ROCCurveVisualiser(
+                input_df=self.similarities_df
+            ).generate_roc_curve(),
+            width=15,
+        )
+        display_roc_curve_btn.grid(row=17, column=0, columnspan=4, sticky=NSEW)
 
         self.root.mainloop()
