@@ -301,7 +301,7 @@ class GUI:
         separator.grid(row=14, column=0, columnspan=4, sticky=NSEW, pady=10)
 
         def __networking(self):
-            similarity_scores = SiameseNetwork(
+            similarity_scores, _ = SiameseNetwork(
                 self.g_counter.get_orbit_counts_df()
             ).predict_similarity()
             self.similarities_df["NeuralNetwork"] = similarity_scores

@@ -18,11 +18,12 @@ class SiameseNetwork:
         self.train_similarity_measures_df = pd.read_csv(
             "neuralNetwork/train_data/similarity_measures.csv"
         )
+        self.threshold = 0.75
 
     def __generate_pairs_labels(self, df):
         pairs, labels = [], self.train_similarity_measures_df["Hellinger"]
 
-        for row in self.train_similarity_measures_df["pair"]:
+        for row in self.train_similarity_measures_df["Pair"]:
             nets = row.split("---")
             pairs.append([df[nets[0]], df[nets[1]]])
 
@@ -81,4 +82,10 @@ class SiameseNetwork:
         self.__compile_model()
         self.__train_model()
         pairs = self.__generate_pairs()
-        return self.model.predict([pairs[:, 0], pairs[:, 1]]).flatten()
+
+        similarity_scores = self.model.predict([pairs[:, 0], pairs[:, 1]]).flatten()
+
+        binary_labels = np.where(similarity_scores >= self.threshold, 0, 0.5)
+        binary_labels = np.where(similarity_scores <= 1 - self.threshold, 1, 0.5)
+
+        return similarity_scores, binary_labels
