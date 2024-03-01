@@ -54,6 +54,7 @@ class GUI:
         hellinger_dist_val,
         minkowski_dist_val,
         cosine_dist_val,
+        p_value,
     ):
         self.similarities_df = pd.concat(
             [
@@ -64,6 +65,7 @@ class GUI:
                     hellinger_dist_val,
                     minkowski_dist_val,
                     cosine_dist_val,
+                    p_value,
                 ),
             ],
             axis=1,
@@ -111,7 +113,7 @@ class GUI:
 
         add_folder_btn = Button(
             frame,
-            text="Add Input Folder",
+            text="Select Input Folder",
             command=lambda: self.__open_folder_dialog(
                 input_folder_listbox, process_data_btn
             ),
@@ -132,7 +134,7 @@ class GUI:
 
         add_folder_btn_o = Button(
             frame,
-            text="Add Output Folder",
+            text="Select Output Folder",
             command=lambda: self.__open_folder_dialog(output_folder_listbox),
             width=15,
         )
@@ -167,7 +169,7 @@ class GUI:
         process_data_btn = Button(
             frame,
             state=DISABLED,
-            text="Process folders",
+            text="Process Files",
             command=lambda: [
                 self.__orca_counting(
                     input_folder_listbox,
@@ -197,7 +199,7 @@ class GUI:
 
         graphs_btn = Button(
             frame,
-            text="Show graphs",
+            text="Show Graphs",
             state=DISABLED,
             command=lambda: DataVisualiser(
                 self.orbit_counts_df
@@ -215,7 +217,7 @@ class GUI:
         RGFD_dist_val = IntVar()
         RGFD_dist_val.set(1)
         RGFD_dist_checkbox = Checkbutton(
-            frame, text="RGFD distance", variable=RGFD_dist_val
+            frame, text="RGF distance", variable=RGFD_dist_val
         )
         RGFD_dist_checkbox.grid(row=8, column=0, pady=[5, 0], sticky=W)
 
@@ -233,19 +235,45 @@ class GUI:
         )
         hellinger_dist_checkbox.grid(row=9, column=0, sticky=W)
 
-        minkowski_dist_val = IntVar()
-        minkowski_dist_val.set(1)
-        minkowski_dist_checkbox = Checkbutton(
-            frame, text="Minkowski distance", variable=minkowski_dist_val
-        )
-        minkowski_dist_checkbox.grid(row=9, column=1, sticky=W)
-
         cosine_dist_val = IntVar()
         cosine_dist_val.set(1)
         cosine_dist_checkbox = Checkbutton(
             frame, text="Cosine distance", variable=cosine_dist_val
         )
-        cosine_dist_checkbox.grid(row=10, column=0, sticky=W)
+        cosine_dist_checkbox.grid(row=9, column=1, sticky=W)
+
+        def toggle_entry_state():
+            if minkowski_dist_val.get() == 1:
+                minkowski_dist_p.config(state=NORMAL)
+            else:
+                minkowski_dist_p.config(state=DISABLED)
+
+        minkowski_dist_val = IntVar()
+        minkowski_dist_val.set(1)
+        minkowski_dist_checkbox = Checkbutton(
+            frame,
+            text="Minkowski distance",
+            variable=minkowski_dist_val,
+            command=toggle_entry_state,
+        )
+        minkowski_dist_checkbox.grid(row=10, column=0, sticky=W)
+
+        def validate_entry(value):
+            if not value:
+                return True
+            try:
+                float_value = float(value)
+                return float_value >= 0
+            except ValueError:
+                return False
+
+        minkowski_dist_p = Entry(
+            frame,
+            validate="all",
+            validatecommand=(frame.register(validate_entry), "%P"),
+        )
+        minkowski_dist_p.insert(0, "2.0")
+        minkowski_dist_p.grid(row=10, column=1, sticky=W)
 
         count_similarities_btn = Button(
             frame,
@@ -258,6 +286,11 @@ class GUI:
                     bool(hellinger_dist_val.get()),
                     bool(minkowski_dist_val.get()),
                     bool(cosine_dist_val.get()),
+                    (
+                        float(minkowski_dist_p.get())
+                        if minkowski_dist_p.get() != ""
+                        else None
+                    ),
                 ),
                 display_similarity_measures_btn.config(
                     state=DISABLED if self.similarities_df is None else NORMAL
@@ -275,7 +308,7 @@ class GUI:
 
         display_graphlet_counts_btn = Button(
             frame,
-            text="Display graphlet counts",
+            text="Graphlet counts",
             state=DISABLED,
             command=lambda: MeasuresViewer(
                 root=self.root,
@@ -287,7 +320,7 @@ class GUI:
 
         display_similarity_measures_btn = Button(
             frame,
-            text="Display similarity values",
+            text="Similarity values",
             state=DISABLED,
             command=lambda: MeasuresViewer(
                 root=self.root,
@@ -343,7 +376,7 @@ class GUI:
 
         display_roc_curve_btn = Button(
             frame,
-            text="Display ROC curve",
+            text="ROC curve",
             state=DISABLED,
             command=lambda: ROCCurveVisualiser(
                 input_df=self.similarities_df

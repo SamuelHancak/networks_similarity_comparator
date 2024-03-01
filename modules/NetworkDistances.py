@@ -69,8 +69,8 @@ class NetworkDistances:
 
         self.similarity_measures_df["Hellinger"] = np.sqrt(result_df.sum()) / np.sqrt(2)
 
-    def computeMinkowskiDist(self):
-        p = 2
+    def computeMinkowskiDist(self, p_value):
+        p = p_value
 
         result_df = pd.DataFrame()
         for col1, col2 in self.column_combinations:

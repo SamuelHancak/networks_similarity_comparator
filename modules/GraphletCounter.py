@@ -152,6 +152,7 @@ class GraphletCounter:
         countHellinger=True,
         countMinkowski=True,
         countCosine=True,
+        p_value=2,
     ):
         dist = NetworkDistances(orbit_counts_df=self.__orbit_couts_df)
 
@@ -165,7 +166,7 @@ class GraphletCounter:
             dist.computeHellingerDist()
 
         if countMinkowski:
-            dist.computeMinkowskiDist()
+            dist.computeMinkowskiDist(p_value if p_value is not None else 2)
 
         if countCosine:
             dist.computeCosineDist()
