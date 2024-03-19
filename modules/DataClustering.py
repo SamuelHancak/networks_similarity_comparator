@@ -4,6 +4,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import plotly.express as px
 from modules.DataNormaliser import DataNormaliser
+from kneed import KneeLocator
 
 
 class DataClustering:
@@ -30,6 +31,30 @@ class DataClustering:
         )
         self.feature_matrix = self.graphlet_counts.values
         self.network_names = self.graphlet_counts.index
+
+    def __determine_optimal_num_clusters(self):
+        wcss = []
+        samples_count = self.input_df.columns.size
+        max_range = 10 if samples_count >= 10 else samples_count
+        for i in range(1, max_range):
+            kmeans = KMeans(
+                n_clusters=i, init="k-means++", max_iter=300, n_init=10, random_state=0
+            )
+            kmeans.fit(self.feature_matrix)
+            wcss.append(kmeans.inertia_)
+
+        knee = KneeLocator(
+            range(1, max_range), wcss, curve="convex", direction="decreasing"
+        )
+
+        self.num_clusters = knee.elbow if knee.elbow else 1
+
+        # plot the elbow curve
+        # fig = px.line(x=range(1, max_range), y=wcss)
+        # fig.update_layout(
+        #     xaxis_title="Number of Clusters", yaxis_title="WCSS", title="Elbow Curve"
+        # )
+        # fig.show()
 
     def __perform_clustering(self):
         self.kmeans = KMeans(n_clusters=self.num_clusters, n_init="auto")
@@ -116,6 +141,7 @@ class DataClustering:
 
     def clustering(self):
         self.__load_and_normalize_data()
+        self.__determine_optimal_num_clusters()
         self.__perform_clustering()
         self.__visualize_clusters_3d()
         return self.__count_distances()
