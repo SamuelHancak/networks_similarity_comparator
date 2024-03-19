@@ -171,12 +171,6 @@ class GraphletCounter:
         if countCosine:
             dist.computeCosineDist()
 
-        if self.output_folder_path is not None:
-            dist.similarity_measures_df.to_csv(
-                f"{self.output_folder_path}/{SIMILARITY_MEASURES_FILE_NAME}",
-                encoding="utf-8",
-            )
-
         return dist.similarity_measures_df
 
     def get_orbit_counts_df(self):

@@ -11,6 +11,8 @@ from modules.ROCCurveVisualiser import ROCCurveVisualiser
 from modules.DataClustering import DataClustering
 from neuralNetwork.NetworkClass import SiameseNetwork
 
+SIMILARITY_MEASURES_FILE_NAME = "similarity_measures.csv"
+
 
 class GUI:
     def __init__(self):
@@ -298,6 +300,14 @@ class GUI:
                 display_roc_curve_btn.config(
                     state=DISABLED if self.similarities_df is None else NORMAL
                 ),
+                export_similarities_btn.config(
+                    state=(
+                        NORMAL
+                        if self.similarities_df is not None
+                        and output_folder_listbox.size() > 0
+                        else DISABLED
+                    )
+                ),
             ],
             width=10,
         )
@@ -305,33 +315,6 @@ class GUI:
 
         separator = ttk.Separator(frame, orient=HORIZONTAL)
         separator.grid(row=12, column=0, columnspan=4, sticky=NSEW, pady=10)
-
-        display_graphlet_counts_btn = Button(
-            frame,
-            text="Graphlet counts",
-            state=DISABLED,
-            command=lambda: MeasuresViewer(
-                root=self.root,
-                graphlet_counts=self.g_counter.get_orbit_counts_df(),
-            ).display_graphlet_counts(),
-            width=15,
-        )
-        display_graphlet_counts_btn.grid(row=13, column=0, sticky=NSEW)
-
-        display_similarity_measures_btn = Button(
-            frame,
-            text="Similarity values",
-            state=DISABLED,
-            command=lambda: MeasuresViewer(
-                root=self.root,
-                similarity_measures=self.similarities_df,
-            ).display_similarity_measures(),
-            width=15,
-        )
-        display_similarity_measures_btn.grid(row=13, column=1, sticky=NSEW)
-
-        separator = ttk.Separator(frame, orient=HORIZONTAL)
-        separator.grid(row=14, column=0, columnspan=4, sticky=NSEW, pady=10)
 
         def __networking(self):
             similarity_scores, _ = SiameseNetwork(
@@ -343,6 +326,15 @@ class GUI:
                 state=DISABLED if self.similarities_df is None else NORMAL
             ),
 
+            export_similarities_btn.config(
+                state=(
+                    NORMAL
+                    if self.similarities_df is not None
+                    and output_folder_listbox.size() > 0
+                    else DISABLED
+                )
+            )
+
         network_btn = Button(
             frame,
             text="Neural network",
@@ -350,7 +342,7 @@ class GUI:
             command=lambda: __networking(self),
             width=15,
         )
-        network_btn.grid(row=15, column=0, sticky=NSEW)
+        network_btn.grid(row=13, column=0, sticky=NSEW)
 
         def __clustering(self):
             self.similarities_df = DataClustering(
@@ -362,6 +354,15 @@ class GUI:
                 state=DISABLED if self.similarities_df is None else NORMAL
             ),
 
+            export_similarities_btn.config(
+                state=(
+                    NORMAL
+                    if self.similarities_df is not None
+                    and output_folder_listbox.size() > 0
+                    else DISABLED
+                )
+            )
+
         clustering_btn = Button(
             frame,
             text="Clustering",
@@ -369,7 +370,34 @@ class GUI:
             command=lambda: __clustering(self),
             width=15,
         )
-        clustering_btn.grid(row=15, column=1, sticky=NSEW)
+        clustering_btn.grid(row=13, column=1, sticky=NSEW)
+
+        separator = ttk.Separator(frame, orient=HORIZONTAL)
+        separator.grid(row=14, column=0, columnspan=4, sticky=NSEW, pady=10)
+
+        display_graphlet_counts_btn = Button(
+            frame,
+            text="Graphlet counts",
+            state=DISABLED,
+            command=lambda: MeasuresViewer(
+                root=self.root,
+                graphlet_counts=self.g_counter.get_orbit_counts_df(),
+            ).display_graphlet_counts(),
+            width=15,
+        )
+        display_graphlet_counts_btn.grid(row=15, column=0, sticky=NSEW)
+
+        display_similarity_measures_btn = Button(
+            frame,
+            text="Similarity values",
+            state=DISABLED,
+            command=lambda: MeasuresViewer(
+                root=self.root,
+                similarity_measures=self.similarities_df,
+            ).display_similarity_measures(),
+            width=15,
+        )
+        display_similarity_measures_btn.grid(row=15, column=1, sticky=NSEW)
 
         separator = ttk.Separator(frame, orient=HORIZONTAL)
         separator.grid(row=16, column=0, columnspan=4, sticky=NSEW, pady=10)
@@ -383,6 +411,25 @@ class GUI:
             ).generate_roc_curve(),
             width=15,
         )
-        display_roc_curve_btn.grid(row=17, column=0, columnspan=4, sticky=NSEW)
+        display_roc_curve_btn.grid(row=17, column=0, sticky=NSEW)
+
+        def export_similarities():
+            self.similarities_df.to_csv(
+                f"{output_folder_listbox.get(0, END)[0]}/{SIMILARITY_MEASURES_FILE_NAME}",
+                encoding="utf-8",
+            )
+
+        export_similarities_btn = Button(
+            frame,
+            text="Export similarities",
+            state=DISABLED,
+            command=lambda: (
+                export_similarities()
+                if self.similarities_df is not None and output_folder_listbox.size() > 0
+                else None
+            ),
+            width=15,
+        )
+        export_similarities_btn.grid(row=17, column=1, sticky=NSEW)
 
         self.root.mainloop()
