@@ -1,55 +1,19 @@
-# import matplotlib.pyplot as plt
-# import pandas as pd
-# from modules.DataNormalizer import DataNormalizer
+import pandas as pd
 
-# from shapely import MultiPoint
-# from shapely.geometry import Polygon
 
-# input = (
-#     DataNormalizer(
-#         pd.read_csv("output/graphlet_counts.csv")
-#     ).percentual_normalisation()["geo1k_4k"]
-#     * 100
+graphlet_counts_df = pd.read_csv(
+    "neuralNetwork/train_data/graphlet_counts_final.csv"
+).drop(columns=["Unnamed: 0"])
+graphlet_counts_df.to_csv(
+    "neuralNetwork/train_data/graphlet_counts_final_2.csv", index=False
+)
+print(graphlet_counts_df.head())
+# similarity_measures_df = pd.read_csv(
+#     "neuralNetwork/train_data/similarity_measures_final.csv"
+# )
+# similarity_measures_df.rename(columns={"Unnamed: 0": "Pair"}, inplace=True)
+# similarity_measures_df.to_csv(
+#     "neuralNetwork/train_data/similarity_measures_final_2.csv", index=False
 # )
 
-# coordinates = input.values.reshape((15, 2))
-
-
-# ob = Polygon(coordinates)
-
-# x, y = ob.exterior.xy
-
-# plt.plot(x, y, color="b", alpha=0.7, linewidth=2, solid_capstyle="round", zorder=2)
-# plt.fill(x, y, color="b", alpha=0.3, zorder=1)
-
-# plt.title("Polygon Display using Shapely and Matplotlib")
-# plt.xlabel("X-axis")
-# plt.ylabel("Y-axis")
-
-# plt.show()
-
-import pandas as pd
-from shapely.geometry import Polygon
-from modules.DataNormaliser import DataNormaliser
-
-df = (
-    DataNormaliser(
-        pd.read_csv("output/graphlet_counts.csv").drop(columns=["Unnamed: 0"])
-    ).percentual_normalisation()
-    * 100
-)
-
-polygons_arr = []
-for col in df.columns:
-    coordinates = df[col].values.reshape((15, 2))
-
-    poly = Polygon(coordinates)
-    poly = poly.buffer(0)
-    polygons_arr.append(poly)
-
-print(polygons_arr[2].intersection(polygons_arr[1]).area)
-print(polygons_arr[2].union(polygons_arr[1]).area)
-print(
-    polygons_arr[2].intersection(polygons_arr[1]).area
-    / polygons_arr[2].union(polygons_arr[1]).area
-)
+# print(similarity_measures_df.head())

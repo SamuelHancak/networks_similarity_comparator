@@ -10,6 +10,7 @@ from modules.MeasuresViewer import MeasuresViewer
 from modules.ROCCurveVisualiser import ROCCurveVisualiser
 from modules.DataClustering import DataClustering
 from neuralNetwork.NetworkClass import SiameseNetwork
+from modules.DataNormaliser import DataNormaliser
 
 SIMILARITY_MEASURES_FILE_NAME = "similarity_measures.csv"
 
@@ -297,6 +298,9 @@ class GUI:
                 display_similarity_measures_btn.config(
                     state=DISABLED if self.similarities_df is None else NORMAL
                 ),
+                display_similarities_discretized_btn.config(
+                    state=DISABLED if self.similarities_df is None else NORMAL
+                ),
                 display_roc_curve_btn.config(
                     state=DISABLED if self.similarities_df is None else NORMAL
                 ),
@@ -317,12 +321,16 @@ class GUI:
         separator.grid(row=12, column=0, columnspan=4, sticky=NSEW, pady=10)
 
         def __networking(self):
-            similarity_scores, _ = SiameseNetwork(
+            similarity_scores = SiameseNetwork(
                 self.g_counter.get_orbit_counts_df()
             ).predict_similarity()
             self.similarities_df["NeuralNetwork"] = similarity_scores
 
             display_similarity_measures_btn.config(
+                state=DISABLED if self.similarities_df is None else NORMAL
+            ),
+
+            display_similarities_discretized_btn.config(
                 state=DISABLED if self.similarities_df is None else NORMAL
             ),
 
@@ -351,6 +359,10 @@ class GUI:
             ).clustering()
 
             display_similarity_measures_btn.config(
+                state=DISABLED if self.similarities_df is None else NORMAL
+            ),
+
+            display_similarities_discretized_btn.config(
                 state=DISABLED if self.similarities_df is None else NORMAL
             ),
 
@@ -431,5 +443,24 @@ class GUI:
             width=15,
         )
         export_similarities_btn.grid(row=17, column=1, sticky=NSEW)
+
+        separator = ttk.Separator(frame, orient=HORIZONTAL)
+        separator.grid(row=18, column=0, columnspan=4, sticky=NSEW, pady=10)
+
+        display_similarities_discretized_btn = Button(
+            frame,
+            text="Discretized values",
+            state=DISABLED,
+            command=lambda: MeasuresViewer(
+                root=self.root,
+                similarity_measures=DataNormaliser(
+                    self.similarities_df
+                ).discretize_data(),
+            ).display_similarity_measures(),
+            width=15,
+        )
+        display_similarities_discretized_btn.grid(
+            row=19, column=0, columnspan=4, sticky=NSEW
+        )
 
         self.root.mainloop()

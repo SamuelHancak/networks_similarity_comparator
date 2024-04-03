@@ -35,7 +35,7 @@ class DataClustering:
     def __determine_optimal_num_clusters(self):
         wcss = []
         samples_count = self.input_df.columns.size
-        max_range = 10 if samples_count >= 10 else samples_count
+        max_range = 20 if samples_count >= 10 else samples_count
         for i in range(1, max_range):
             kmeans = KMeans(
                 n_clusters=i, init="k-means++", max_iter=300, n_init=10, random_state=0
@@ -49,7 +49,7 @@ class DataClustering:
 
         self.num_clusters = knee.elbow if knee.elbow else 1
 
-        # plot the elbow curve
+        # # plot the elbow curve
         # fig = px.line(x=range(1, max_range), y=wcss)
         # fig.update_layout(
         #     xaxis_title="Number of Clusters", yaxis_title="WCSS", title="Elbow Curve"

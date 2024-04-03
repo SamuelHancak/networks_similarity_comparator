@@ -13,12 +13,11 @@ class SiameseNetwork:
         self.input_dim = 30
         self.graphlet_counts_df = graphlet_counts_df
         self.train_graphlet_counts_df = pd.read_csv(
-            "neuralNetwork/train_data/graphlet_counts.csv"
+            "neuralNetwork/train_data/graphlet_counts_final_2.csv"
         )
         self.train_similarity_measures_df = pd.read_csv(
-            "neuralNetwork/train_data/similarity_measures.csv"
+            "neuralNetwork/train_data/similarity_measures_final_2.csv"
         )
-        self.threshold = 0.75
 
     def __generate_pairs_labels(self, df):
         pairs, labels = [], self.train_similarity_measures_df["Hellinger"]
@@ -32,10 +31,12 @@ class SiameseNetwork:
     def __siamese_network(self):
         model = Sequential(
             [
-                Dense(128, activation="sigmoid", input_shape=(self.input_dim,)),
+                Dense(256, activation="sigmoid", input_shape=(self.input_dim,)),
+                Dense(128, activation="sigmoid"),
                 Dense(64, activation="sigmoid"),
             ]
         )
+
         return model
 
     def __create_siamese_model(self):
@@ -51,6 +52,7 @@ class SiameseNetwork:
         )
 
         model = Model(inputs=[input_a, input_b], outputs=similarity_score)
+
         return model
 
     def __compile_model(self):
@@ -85,7 +87,4 @@ class SiameseNetwork:
 
         similarity_scores = self.model.predict([pairs[:, 0], pairs[:, 1]]).flatten()
 
-        binary_labels = np.where(similarity_scores >= self.threshold, 0, 0.5)
-        binary_labels = np.where(similarity_scores <= 1 - self.threshold, 1, 0.5)
-
-        return similarity_scores, binary_labels
+        return similarity_scores

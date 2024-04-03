@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.preprocessing import KBinsDiscretizer
 
 
 class DataNormaliser:
@@ -23,3 +24,13 @@ class DataNormaliser:
 
     def percentual_normalisation(self):
         return self.data.apply(lambda col: col / (col.sum() or 1))
+
+    def discretize_data(self):
+        df_scaled = self.data.copy()
+        discretizer = KBinsDiscretizer(
+            n_bins=3, encode="ordinal", strategy="kmeans", subsample=None
+        )
+        transformed_data = discretizer.fit_transform(df_scaled.iloc[:, 0:])
+        df_scaled.iloc[:, 0:] = np.round(transformed_data)
+
+        return df_scaled
