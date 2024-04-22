@@ -8,15 +8,15 @@ import tensorflow.keras.backend as K
 from tensorflow.keras.callbacks import EarlyStopping
 
 
-class SiameseNetwork:
+class NetworkClass:
     def __init__(self, graphlet_counts_df):
         self.input_dim = 30
         self.graphlet_counts_df = graphlet_counts_df
         self.train_graphlet_counts_df = pd.read_csv(
-            "neuralNetwork/train_data/graphlet_counts_final_2.csv"
+            "neuralNetwork/train_data/graphlet_counts.csv"
         )
         self.train_similarity_measures_df = pd.read_csv(
-            "neuralNetwork/train_data/similarity_measures_final_2.csv"
+            "neuralNetwork/train_data/similarity_measures.csv"
         )
 
     def __generate_pairs_labels(self, df):

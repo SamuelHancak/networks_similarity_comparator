@@ -38,7 +38,12 @@ class ROCCurveVisualiser:
 
         fig.add_trace(
             go.Scatter(
-                x=[0, 1], y=[0, 1], mode="lines", name="Random", line=dict(dash="dash")
+                x=[0, 1],
+                y=[0, 1],
+                mode="lines",
+                name="Random",
+                line=dict(dash="dash"),
+                showlegend=False,
             )
         )
 
@@ -47,14 +52,14 @@ class ROCCurveVisualiser:
             yaxis_title="True Positive Rate",
             title="ROC Curve for Similarity Measures",
             showlegend=True,
+            legend=dict(
+                orientation="h",
+                entrywidth=200,
+                yanchor="bottom",
+                y=1.01,
+                xanchor="auto",
+                x=1,
+            ),
         )
 
         fig.show()
-
-
-# file_path = "similarity_measures.csv"
-# roc_plotter = SimilarityMeasuresROC(
-#     file_path=file_path,
-#     compared_measure="Minkowski",
-# )
-# roc_plotter.generate_roc_curve()

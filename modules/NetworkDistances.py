@@ -65,7 +65,9 @@ class NetworkDistances:
                 - self.orbit_counts_percentual_normal[col1]
             ).abs() ** p
 
-        self.similarity_measures_df["Minkowski"] = result_df.sum() ** (1 / p)
+        self.similarity_measures_df[f"Minkowski(p={p_value})"] = result_df.sum() ** (
+            1 / p
+        )
 
     def computeCosineDist(self):
         similarity_matrix = cosine_distances(self.orbit_counts_percentual_normal.T)
@@ -81,19 +83,11 @@ class NetworkDistances:
 
         self.similarity_measures_df["Cosine"] = result_df.T
 
-    def computeJaccardSimilarity(self):
-        computations = self.orbit_counts_df.copy()
+    # def computeNetSimileDist(self):
+    #     result_df = pd.DataFrame()
+    #     for col1, col2 in self.column_combinations:
+    #         result_df[col2 + "---" + col1] = (
+    #             computations[col2] - computations[col1]
+    #         ).abs()
 
-        result_df = pd.DataFrame()
-        for col1, col2 in self.column_combinations:
-            set1 = set(computations[col1].index[computations[col1] > 0])
-            set2 = set(computations[col2].index[computations[col2] > 0])
-
-            intersection_size = len(set1.intersection(set2))
-            union_size = len(set1.union(set2))
-
-            result_df[col2 + "---" + col1] = (
-                intersection_size / union_size if union_size != 0 else 0
-            )
-
-        self.similarity_measures_df["JaccardSimilarity"] = result_df.mean()
+    #     self.similarity_measures_df["NetSimile"] = result_df.sum() / 2

@@ -22,6 +22,7 @@ class GraphletCounter:
         self.out_data = out_data
         self.freq_data = freq_data
         self.__orbit_couts_df = pd.DataFrame()
+        self.__input_files = []
 
     def __sum_columns(self, file_name, column_name):
         df = pd.read_csv(file_name, sep=" ", header=None)
@@ -80,16 +81,15 @@ class GraphletCounter:
             lines = [line.strip() for line in file.readlines()[:30]]
 
         lines = pd.to_numeric(lines, errors="coerce")
-
         df = pd.DataFrame(lines, columns=[file_name])
 
         return df
 
     def orca_counting(self):
         orbit_counts_df = pd.DataFrame()
-        input_files = self.__read_folder_files()
+        self.__input_files = self.__read_folder_files()
 
-        for file in input_files:
+        for file in self.__input_files:
             file_name = file.split("/")[-1].replace(
                 ".out" if self.out_data else ".in", ""
             )
@@ -175,3 +175,6 @@ class GraphletCounter:
 
     def get_orbit_counts_df(self):
         return self.__orbit_couts_df
+
+    def get_input_files(self):
+        return self.__input_files

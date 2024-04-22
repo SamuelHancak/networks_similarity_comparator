@@ -9,7 +9,7 @@ from modules.GraphletCounter import GraphletCounter
 from modules.MeasuresViewer import MeasuresViewer
 from modules.ROCCurveVisualiser import ROCCurveVisualiser
 from modules.DataClustering import DataClustering
-from neuralNetwork.NetworkClass import SiameseNetwork
+from neuralNetwork.NetworkClass import NetworkClass
 from modules.DataNormaliser import DataNormaliser
 
 SIMILARITY_MEASURES_FILE_NAME = "similarity_measures.csv"
@@ -321,7 +321,7 @@ class GUI:
         separator.grid(row=12, column=0, columnspan=4, sticky=NSEW, pady=10)
 
         def __networking(self):
-            similarity_scores = SiameseNetwork(
+            similarity_scores = NetworkClass(
                 self.g_counter.get_orbit_counts_df()
             ).predict_similarity()
             self.similarities_df["NeuralNetwork"] = similarity_scores
@@ -416,7 +416,7 @@ class GUI:
 
         display_roc_curve_btn = Button(
             frame,
-            text="ROC curve",
+            text="ROC curves",
             state=DISABLED,
             command=lambda: ROCCurveVisualiser(
                 input_df=self.similarities_df
