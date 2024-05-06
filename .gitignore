@@ -50,6 +50,5 @@ l10n/
 **/.idea
 **/output
 **/__pycache__
-*.out
 *.csv
 **/venv
