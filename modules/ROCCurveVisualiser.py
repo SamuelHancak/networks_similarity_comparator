@@ -1,32 +1,29 @@
+import pandas as pd
 from sklearn.metrics import roc_curve, auc
 import plotly.graph_objects as go
+from sklearn.preprocessing import KBinsDiscretizer
 
 
 class ROCCurveVisualiser:
     def __init__(
         self,
         input_df,
-        compared_measure="Hellinger",
+        compared_measure,
     ):
         self.input_df = input_df
         self.compared_measure = compared_measure
 
     def generate_roc_curve(self):
-        true_values = (
-            (
-                self.input_df[self.compared_measure]
-                < self.input_df[self.compared_measure].mean()
-            )
-            .astype(int)
-            .values
+        discretizer = KBinsDiscretizer(
+            n_bins=2, encode="ordinal", strategy="kmeans", subsample=None
         )
+        true_values = discretizer.fit_transform(
+            self.input_df[self.compared_measure].values.reshape(-1, 1)
+        ).flatten()
         fig = go.Figure()
 
         for column in self.input_df.columns:
             fpr, tpr, _ = roc_curve(true_values, self.input_df[column])
-
-            fpr = 1 - fpr
-            tpr = 1 - tpr
 
             auc_value = auc(fpr, tpr)
 

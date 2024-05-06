@@ -11,6 +11,7 @@ from modules.ROCCurveVisualiser import ROCCurveVisualiser
 from modules.DataClustering import DataClustering
 from neuralNetwork.NetworkClass import NetworkClass
 from modules.DataNormaliser import DataNormaliser
+from modules.NetSimile import NetSimileClass
 
 SIMILARITY_MEASURES_FILE_NAME = "similarity_measures.csv"
 
@@ -414,13 +415,31 @@ class GUI:
         separator = ttk.Separator(frame, orient=HORIZONTAL)
         separator.grid(row=16, column=0, columnspan=4, sticky=NSEW, pady=10)
 
+        def roc_curve_netSimile():
+            netSimValuesDf = NetSimileClass(
+                path=self.g_counter.get_input_folder_path()
+            ).compile_process()
+            self.similarities_df = pd.merge(
+                self.similarities_df, netSimValuesDf, left_index=True, right_index=True
+            )
+            self.similarities_df.fillna(0, inplace=True)
+            roc_curve_btn_click("NetSimDist")
+
+        def roc_curve_btn_click(compared_measure="Hellinger"):
+            ROCCurveVisualiser(
+                input_df=self.similarities_df,
+                compared_measure=compared_measure,
+            ).generate_roc_curve()
+
         display_roc_curve_btn = Button(
             frame,
             text="ROC curves",
             state=DISABLED,
-            command=lambda: ROCCurveVisualiser(
-                input_df=self.similarities_df
-            ).generate_roc_curve(),
+            command=lambda: (
+                roc_curve_btn_click()
+                if bool(orca_data_val.get()) or bool(graphlet_freq_data_val.get())
+                else roc_curve_netSimile()
+            ),
             width=15,
         )
         display_roc_curve_btn.grid(row=17, column=0, sticky=NSEW)

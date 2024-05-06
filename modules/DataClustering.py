@@ -35,7 +35,7 @@ class DataClustering:
     def __determine_optimal_num_clusters(self):
         wcss = []
         samples_count = self.input_df.columns.size
-        max_range = 20 if samples_count >= 10 else samples_count
+        max_range = 20 if samples_count >= 20 else samples_count
         for i in range(1, max_range):
             kmeans = KMeans(
                 n_clusters=i, init="k-means++", max_iter=300, n_init=10, random_state=0
@@ -56,7 +56,14 @@ class DataClustering:
         fig.show()
 
     def __perform_clustering(self):
-        self.kmeans = KMeans(n_clusters=self.num_clusters, n_init="auto")
+        self.kmeans = KMeans(
+            n_clusters=(
+                self.num_clusters
+                if self.num_clusters < self.input_df.columns.size
+                else self.input_df.columns.size
+            ),
+            n_init="auto",
+        )
         self.labels = self.kmeans.fit_predict(self.feature_matrix)
         self.distances = self.kmeans.transform(self.feature_matrix)
 
@@ -70,12 +77,14 @@ class DataClustering:
         )
 
     def __count_distances(self):
-        column_combinations = list(combinations(self.coordinates_df.columns, 2))
+        column_combinations = sorted(
+            list(combinations(sorted(self.coordinates_df.columns), 2))
+        )
 
         result_df = pd.DataFrame()
         for col1, col2 in column_combinations:
-            result_df[col2 + "---" + col1] = abs(
-                self.coordinates_df[col2] - self.coordinates_df[col1]
+            result_df[col1 + "---" + col2] = abs(
+                self.coordinates_df[col1] - self.coordinates_df[col2]
             )
 
         self.similarity_measures_df["Clustering"] = result_df.sum()

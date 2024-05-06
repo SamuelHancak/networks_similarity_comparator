@@ -73,7 +73,9 @@ class NetworkClass:
         )
 
     def __generate_pairs(self):
-        column_combinations = list(combinations(self.graphlet_counts_df.columns, 2))
+        column_combinations = sorted(
+            list(combinations(sorted(self.graphlet_counts_df.columns), 2))
+        )
         pairs = []
         for col1, col2 in column_combinations:
             pairs.append([self.graphlet_counts_df[col1], self.graphlet_counts_df[col2]])

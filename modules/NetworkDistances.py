@@ -9,7 +9,9 @@ class NetworkDistances:
     def __init__(self, orbit_counts_df):
         self.orbit_counts_df = orbit_counts_df
         self.similarity_measures_df = pd.DataFrame()
-        self.column_combinations = list(combinations(self.orbit_counts_df.columns, 2))
+        self.column_combinations = sorted(
+            list(combinations(sorted(self.orbit_counts_df.columns), 2))
+        )
         self.orbit_counts_percentual_normal = DataNormaliser(
             orbit_counts_df
         ).percentual_normalisation()
@@ -25,7 +27,7 @@ class NetworkDistances:
             zero_mask = (computations[col1] == 0) | (computations[col2] == 0)
             distance.loc[zero_mask] = 0
 
-            result_df[col2 + "---" + col1] = distance
+            result_df[col1 + "---" + col2] = distance
 
         self.similarity_measures_df["RGFDist"] = result_df.sum()
 
@@ -36,8 +38,8 @@ class NetworkDistances:
 
         result_df = pd.DataFrame()
         for col1, col2 in self.column_combinations:
-            result_df[col2 + "---" + col1] = (
-                computations[col2] - computations[col1]
+            result_df[col1 + "---" + col2] = (
+                computations[col1] - computations[col2]
             ).abs()
 
         self.similarity_measures_df["SimDisp"] = result_df.sum() / 2
@@ -49,8 +51,8 @@ class NetworkDistances:
 
         result_df = pd.DataFrame()
         for col1, col2 in self.column_combinations:
-            result_df[col2 + "---" + col1] = (
-                computations[col2] - computations[col1]
+            result_df[col1 + "---" + col2] = (
+                computations[col1] - computations[col2]
             ) ** 2
 
         self.similarity_measures_df["Hellinger"] = np.sqrt(result_df.sum()) / np.sqrt(2)
@@ -60,9 +62,9 @@ class NetworkDistances:
 
         result_df = pd.DataFrame()
         for col1, col2 in self.column_combinations:
-            result_df[col2 + "---" + col1] = (
-                self.orbit_counts_percentual_normal[col2]
-                - self.orbit_counts_percentual_normal[col1]
+            result_df[col1 + "---" + col2] = (
+                self.orbit_counts_percentual_normal[col1]
+                - self.orbit_counts_percentual_normal[col2]
             ).abs() ** p
 
         self.similarity_measures_df[f"Minkowski(p={p_value})"] = result_df.sum() ** (
@@ -74,20 +76,11 @@ class NetworkDistances:
 
         result_df = pd.DataFrame()
         for col1, col2 in self.column_combinations:
-            result_df[col2 + "---" + col1] = [
+            result_df[col1 + "---" + col2] = [
                 similarity_matrix[
-                    self.orbit_counts_percentual_normal.columns.get_loc(col2),
                     self.orbit_counts_percentual_normal.columns.get_loc(col1),
+                    self.orbit_counts_percentual_normal.columns.get_loc(col2),
                 ]
             ]
 
         self.similarity_measures_df["Cosine"] = result_df.T
-
-    # def computeNetSimileDist(self):
-    #     result_df = pd.DataFrame()
-    #     for col1, col2 in self.column_combinations:
-    #         result_df[col2 + "---" + col1] = (
-    #             computations[col2] - computations[col1]
-    #         ).abs()
-
-    #     self.similarity_measures_df["NetSimile"] = result_df.sum() / 2

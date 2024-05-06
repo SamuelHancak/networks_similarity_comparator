@@ -176,5 +176,5 @@ class GraphletCounter:
     def get_orbit_counts_df(self):
         return self.__orbit_couts_df
 
-    def get_input_files(self):
-        return self.__input_files
+    def get_input_folder_path(self):
+        return self.input_folder_path
