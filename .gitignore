@@ -48,7 +48,10 @@ dist/**
 package.nls.*.json
 l10n/
 **/.idea
+**/input
 **/output
 **/__pycache__
+*.in
+*.out
 *.csv
 **/venv
